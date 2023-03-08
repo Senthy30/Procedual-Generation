@@ -6,69 +6,66 @@ using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour {
 
-	public enum DrawMode {NoiseMap, ColourMap, Mesh, FalloffMap, Heat, Moisture, Biome};
+	public enum DrawMode {NoiseMap, Mesh, FalloffMap};
 	public DrawMode drawMode;
 
-	public Noise.NormalizeMode normalizeMode;
+	public TerrainData terrainData;
+	public NoiseData noiseData;
+	public TextureData textureData;
 
-	public const int mapChunkSize = 239;
-	[Range(0,6)]
+	public Material terrainMaterial;
+
+	[Range(0,MeshGenerator.numSupportedChunkSizes-1)]
+	public int chunkSizeIndex;
+	[Range(0,MeshGenerator.numSupportedFlatshadedChunkSizes-1)]
+	public int flatshadedChunkSizeIndex;
+
+	[Range(0,MeshGenerator.numSupportedLODs-1)]
 	public int editorPreviewLOD;
-	public float noiseScale;
-
-	public float oceanLevel;
-
-	public int octaves;
-	[Range(0,1)]
-	public float persistance;
-	public float lacunarity;
-	public float amplitude, frequency;
-
-
-    public int seed;
-	public Vector2 offset;
-
-	public bool useFalloff;
-
-	public float meshHeightMultiplier;
-	public AnimationCurve meshHeightCurve;
-
 	public bool autoUpdate;
-
-	public AnimationCurve moistureHeightCurve;
-    public Gradient amplificationGradient;
-    public NoiseData[] noiseData;
-	public Biomes[] biomes;
-
-    public TerrainType[] regions;
 
 	float[,] falloffMap;
 
 	Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
 	Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
+
 	void Awake() {
-		falloffMap = FalloffGenerator.GenerateFalloffMap (mapChunkSize);
+		textureData.ApplyToMaterial (terrainMaterial);
+		textureData.UpdateMeshHeights (terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
+	}
+
+	void OnValuesUpdated() {
+		if (!Application.isPlaying) {
+			DrawMapInEditor ();
+		}
+	}
+
+	void OnTextureValuesUpdated() {
+		textureData.ApplyToMaterial (terrainMaterial);
+	}
+
+	public int mapChunkSize {
+		get {
+			if (terrainData.useFlatShading) {
+				return MeshGenerator.supportedFlatshadedChunkSizes [flatshadedChunkSizeIndex] -1;
+			} else {
+				return MeshGenerator.supportedChunkSizes [chunkSizeIndex] -1;
+			}
+		}
 	}
 
 	public void DrawMapInEditor() {
+		textureData.UpdateMeshHeights (terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
 		MapData mapData = GenerateMapData (Vector2.zero);
 
 		MapDisplay display = FindObjectOfType<MapDisplay> ();
 		if (drawMode == DrawMode.NoiseMap) {
 			display.DrawTexture (TextureGenerator.TextureFromHeightMap (mapData.heightMap));
-		} else if (drawMode == DrawMode.ColourMap) {
-			display.DrawTexture (TextureGenerator.TextureFromColourMap (mapData.colourMap, mapChunkSize, mapChunkSize));
 		} else if (drawMode == DrawMode.Mesh) {
-			display.DrawMesh (MeshGenerator.GenerateTerrainMesh (mapData.heightMap, meshHeightMultiplier, meshHeightCurve, editorPreviewLOD), TextureGenerator.TextureFromColourMap (mapData.colourMap, mapChunkSize, mapChunkSize));
+			display.DrawMesh (MeshGenerator.GenerateTerrainMesh (mapData.heightMap, terrainData.meshHeightMultiplier, terrainData.meshHeightCurve, editorPreviewLOD,terrainData.useFlatShading));
 		} else if (drawMode == DrawMode.FalloffMap) {
 			display.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapChunkSize)));
-		} else if(drawMode == DrawMode.Heat) {
-			display.DrawTexture(Biome.CreateHeatTexture(mapChunkSize, mapData.heatMap, ref amplificationGradient));
-		} else if(drawMode == DrawMode.Moisture) {
-            display.DrawTexture(Biome.CreateMoistureTexture(mapChunkSize, mapData.moistureMap, ref amplificationGradient));
-        } else if(drawMode == DrawMode.Biome) {
-			display.DrawTexture(Biome.CreateBiomesTexture(mapChunkSize, mapData.biomesMap, ref biomes));
 		}
 	}
 
@@ -96,7 +93,7 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 	void MeshDataThread(MapData mapData, int lod, Action<MeshData> callback) {
-		MeshData meshData = MeshGenerator.GenerateTerrainMesh (mapData.heightMap, meshHeightMultiplier, meshHeightCurve, lod);
+		MeshData meshData = MeshGenerator.GenerateTerrainMesh (mapData.heightMap, terrainData.meshHeightMultiplier, terrainData.meshHeightCurve, lod,terrainData.useFlatShading);
 		lock (meshDataThreadInfoQueue) {
 			meshDataThreadInfoQueue.Enqueue (new MapThreadInfo<MeshData> (callback, meshData));
 		}
@@ -119,69 +116,43 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 	MapData GenerateMapData(Vector2 centre) {
-		int indexHeatMapNoise = 0;
-		int indexMoistureMapNoise = 1;
+		float[,] noiseMap = Noise.GenerateNoiseMap (mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.noiseScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, centre + noiseData.offset, noiseData.normalizeMode);
 
-        float[,] noiseMap = Noise.GenerateNoiseMap (
-			mapChunkSize + 2, mapChunkSize + 2, seed, noiseScale, octaves, persistance, lacunarity, 
-			centre + offset, normalizeMode, amplitude, frequency
-		);
-		
-		float[,] heatMap = Biome.CreateHeatNoise(
-			mapChunkSize + 2, seed, noiseScale, normalizeMode, centre + offset, 
-			ref noiseData[indexHeatMapNoise], ref noiseMap
-		);
+		if (terrainData.useFalloff) {
 
-		float[,] moistureMap = Biome.CreateMoistureNoise(
-			mapChunkSize + 2, seed, noiseScale, normalizeMode, centre + offset, 
-			ref noiseData[indexMoistureMapNoise], ref noiseMap, ref heatMap, ref moistureHeightCurve
-		);
-
-		int[,] biomesMap = Biome.CreateBiomesNoise(
-			mapChunkSize + 2, centre + offset, 
-			ref noiseMap, ref heatMap, ref moistureMap, ref biomes
-		);
-
-        Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
-		//for (int y = 0; y < mapChunkSize; y++) {
-		//	for (int x = 0; x < mapChunkSize; x++) {
-		//		if (useFalloff) {
-		//			noiseMap [x, y] = Mathf.Clamp01(noiseMap [x, y] - falloffMap [x, y]);
-		//		}
-		//		float currentHeight = noiseMap [x, y];
-		//		for (int i = 0; i < regions.Length; i++) {
-		//			if (currentHeight >= regions [i].height) {
-		//				colourMap [y * mapChunkSize + x] = regions [i].colour;
-		//			} else {
-		//				break;
-		//			}
-		//		}
-		//	}
-		//}
-
-		bool wasPrinted = false;
-        for (int y = 0; y < mapChunkSize; y++) {
-            for (int x = 0; x < mapChunkSize; x++) {
-                colourMap[y * mapChunkSize + x] = biomes[biomesMap[x, y]].color;
-				if(!wasPrinted && colourMap[y * mapChunkSize + x] == Color.black) {
-					Debug.Log(new Vector3(noiseMap[x, y], heatMap[x, y], moistureMap[x, y]));
-					///wasPrinted = true;
+			if (falloffMap == null) {
+				falloffMap = FalloffGenerator.GenerateFalloffMap (mapChunkSize + 2);
+			}
+			 
+			for (int y = 0; y < mapChunkSize+2; y++) {
+				for (int x = 0; x < mapChunkSize+2; x++) {
+					if (terrainData.useFalloff) {
+						noiseMap [x, y] = Mathf.Clamp01 (noiseMap [x, y] - falloffMap [x, y]);
+					}
+				
 				}
-            }
-        }
+			}
 
-        return new MapData (noiseMap, heatMap, moistureMap, biomesMap, colourMap);
+		}
+
+		return new MapData (noiseMap);
 	}
 
-    void OnValidate() {
-		if (lacunarity < 1) {
-			lacunarity = 1;
+	void OnValidate() {
+
+		if (terrainData != null) {
+			terrainData.OnValuesUpdated -= OnValuesUpdated;
+			terrainData.OnValuesUpdated += OnValuesUpdated;
 		}
-		if (octaves < 0) {
-			octaves = 0;
+		if (noiseData != null) {
+			noiseData.OnValuesUpdated -= OnValuesUpdated;
+			noiseData.OnValuesUpdated += OnValuesUpdated;
+		}
+		if (textureData != null) {
+			textureData.OnValuesUpdated -= OnTextureValuesUpdated;
+			textureData.OnValuesUpdated += OnTextureValuesUpdated;
 		}
 
-		falloffMap = FalloffGenerator.GenerateFalloffMap (mapChunkSize);
 	}
 
 	struct MapThreadInfo<T> {
@@ -197,26 +168,14 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 }
-
-[System.Serializable]
-public struct TerrainType {
-	public string name;
-	public float height;
-	public Color colour;
-}
+	
 
 public struct MapData {
 	public readonly float[,] heightMap;
-	public readonly float[,] heatMap;
-	public readonly float[,] moistureMap;
-	public readonly int[,] biomesMap;
-	public readonly Color[] colourMap;
 
-	public MapData (float[,] heightMap, float[,] heatMap, float[,] moistureMap, int[,] biomesMap, Color[] colourMap) {
+
+	public MapData (float[,] heightMap)
+	{
 		this.heightMap = heightMap;
-		this.heatMap = heatMap;
-		this.moistureMap = moistureMap;
-		this.biomesMap = biomesMap;
-		this.colourMap = colourMap;
 	}
 }

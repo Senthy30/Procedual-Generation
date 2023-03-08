@@ -1,21 +1,19 @@
-﻿using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public static class Noise {
 
 	public enum NormalizeMode {Local, Global};
 
-	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int octaves, float persistance, float lacunarity, Vector2 offset, NormalizeMode normalizeMode, float startAmplitude = 1, float startFrequency = 1) {
-		
+	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int octaves, float persistance, float lacunarity, Vector2 offset, NormalizeMode normalizeMode) {
 		float[,] noiseMap = new float[mapWidth,mapHeight];
 
 		System.Random prng = new System.Random (seed);
 		Vector2[] octaveOffsets = new Vector2[octaves];
 
 		float maxPossibleHeight = 0;
-		float amplitude = startAmplitude;
-		float frequency = startFrequency;
+		float amplitude = 1;
+		float frequency = 1;
 
 		for (int i = 0; i < octaves; i++) {
 			float offsetX = prng.Next (-100000, 100000) + offset.x;
@@ -40,8 +38,8 @@ public static class Noise {
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = 0; x < mapWidth; x++) {
 
-				amplitude = startAmplitude;
-				frequency = startFrequency;
+				amplitude = 1;
+				frequency = 1;
 				float noiseHeight = 0;
 
 				for (int i = 0; i < octaves; i++) {
@@ -75,14 +73,7 @@ public static class Noise {
 			}
 		}
 
-		for (int y = 0; y < mapHeight; y++) {
-			for (int x = 0; x < mapWidth; x++) {
-                noiseMap[x, y] = Mathf.Clamp01 (noiseMap[x, y]);
-
-            }
-		}
-
-        return noiseMap;
+		return noiseMap;
 	}
 
 }

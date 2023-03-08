@@ -56,8 +56,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Biomes\BiomesGenerator.cs" />
+    <Compile Include="Assets\Scripts\Data\TerrainData.cs" />
+    <Compile Include="Assets\Scripts\Data\TextureData.cs" />
+    <Compile Include="Assets\Scripts\Data\NoiseData.cs" />
     <Compile Include="Assets\Scripts\MapGenerator.cs" />
+    <Compile Include="Assets\Scripts\Data\UpdatableData.cs" />
     <Compile Include="Assets\Scripts\MapDisplay.cs" />
     <Compile Include="Assets\Scripts\HideOnPlay.cs" />
     <Compile Include="Assets\Scripts\FalloffGenerator.cs" />
@@ -65,7 +68,9 @@
     <Compile Include="Assets\Scripts\EndlessTerrain.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\MeshGenerator.cs" />
-    <Compile Include="Assets\Scripts\Biomes\Biome.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Scripts\Terrain.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

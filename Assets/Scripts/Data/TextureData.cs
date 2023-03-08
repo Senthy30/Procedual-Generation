@@ -14,9 +14,15 @@ public class TextureData : UpdatableData {
 	float savedMaxHeight;
 
 	public void ApplyToMaterial(Material material) {
-		
-		material.SetInt ("layerCount", layers.Length);
-		material.SetColorArray ("baseColours", layers.Select(x => x.tint).ToArray());
+
+		float r1 = Random.Range(0f, 1f), g1 = Random.Range(0f, 1f), b1 = Random.Range(0f, 1f);
+		Debug.Log(new Vector3(r1, g1, b1));
+        material.SetFloat("r1", r1);
+        material.SetFloat("g1", g1);
+        material.SetFloat("b1", b1);
+
+        material.SetInt ("layerCount", layers.Length);
+        material.SetColorArray ("baseColours", layers.Select(x => x.tint).ToArray());
 		material.SetFloatArray ("baseStartHeights", layers.Select(x => x.startHeight).ToArray());
 		material.SetFloatArray ("baseBlends", layers.Select(x => x.blendStrength).ToArray());
 		material.SetFloatArray ("baseColourStrength", layers.Select(x => x.tintStrength).ToArray());

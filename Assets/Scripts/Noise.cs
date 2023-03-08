@@ -5,15 +5,23 @@ public static class Noise {
 
 	public enum NormalizeMode {Local, Global};
 
-	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int octaves, float persistance, float lacunarity, Vector2 offset, NormalizeMode normalizeMode) {
-		float[,] noiseMap = new float[mapWidth,mapHeight];
+	public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, Vector2 centre, NoiseData noiseData) {
+		int seed = noiseData.seed;
+		float scale = noiseData.noiseScale;
+		int octaves = noiseData.octaves;
+		float persistance = noiseData.persistance;
+		float lacunarity = noiseData.lacunarity;
+		Vector2 offset = noiseData.offset + centre;
+		NormalizeMode normalizeMode = noiseData.normalizeMode;
+
+        float[,] noiseMap = new float[mapWidth,mapHeight];
 
 		System.Random prng = new System.Random (seed);
 		Vector2[] octaveOffsets = new Vector2[octaves];
 
 		float maxPossibleHeight = 0;
-		float amplitude = 1;
-		float frequency = 1;
+		float amplitude = noiseData.amplitude;
+		float frequency = noiseData.frequency;
 
 		for (int i = 0; i < octaves; i++) {
 			float offsetX = prng.Next (-100000, 100000) + offset.x;
@@ -38,8 +46,8 @@ public static class Noise {
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = 0; x < mapWidth; x++) {
 
-				amplitude = 1;
-				frequency = 1;
+				amplitude = noiseData.amplitude;
+				frequency = noiseData.frequency;
 				float noiseHeight = 0;
 
 				for (int i = 0; i < octaves; i++) {
@@ -74,6 +82,10 @@ public static class Noise {
 		}
 
 		return noiseMap;
+	}
+
+	public static int test() {
+		return 1;
 	}
 
 }

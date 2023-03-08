@@ -4,6 +4,7 @@ using System.Collections;
 [CreateAssetMenu()]
 public class NoiseData : UpdatableData {
 
+	public string name;
 	public Noise.NormalizeMode normalizeMode;
 
 	public float noiseScale;
@@ -12,8 +13,11 @@ public class NoiseData : UpdatableData {
 	[Range(0,1)]
 	public float persistance;
 	public float lacunarity;
+	public float amplitude;
+	public float frequency;
 
-	public int seed;
+
+    public int seed;
 	public Vector2 offset;
 
 	#if UNITY_EDITOR

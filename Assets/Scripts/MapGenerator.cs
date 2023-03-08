@@ -6,14 +6,15 @@ using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour {
 
-	public enum DrawMode {NoiseMap, Mesh, FalloffMap};
+	public enum DrawMode {NoiseMap, Mesh, Heat, Moisture, Biome};
 	public DrawMode drawMode;
 
 	public TerrainData terrainData;
-	public NoiseData noiseData;
+	public NoiseData[] noiseData;
 	public TextureData textureData;
+	public BiomeData biomeData;
 
-	public Material terrainMaterial;
+    public Material terrainMaterial;
 
 	[Range(0,MeshGenerator.numSupportedChunkSizes-1)]
 	public int chunkSizeIndex;
@@ -24,7 +25,9 @@ public class MapGenerator : MonoBehaviour {
 	public int editorPreviewLOD;
 	public bool autoUpdate;
 
-	float[,] falloffMap;
+	public Gradient amplificationGradient;
+    public AnimationCurve moistureHeightCurve;
+	public Shader terrainShader;
 
 	Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
 	Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
@@ -42,7 +45,9 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 	void OnTextureValuesUpdated() {
-		textureData.ApplyToMaterial (terrainMaterial);
+		Debug.Log("aici");
+        terrainMaterial = new Material(terrainShader);
+        textureData.ApplyToMaterial (terrainMaterial);
 	}
 
 	public int mapChunkSize {
@@ -64,10 +69,14 @@ public class MapGenerator : MonoBehaviour {
 			display.DrawTexture (TextureGenerator.TextureFromHeightMap (mapData.heightMap));
 		} else if (drawMode == DrawMode.Mesh) {
 			display.DrawMesh (MeshGenerator.GenerateTerrainMesh (mapData.heightMap, terrainData.meshHeightMultiplier, terrainData.meshHeightCurve, editorPreviewLOD,terrainData.useFlatShading));
-		} else if (drawMode == DrawMode.FalloffMap) {
-			display.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFalloffMap(mapChunkSize)));
-		}
-	}
+		} else if (drawMode == DrawMode.Heat) {
+            display.DrawTexture(Biome.CreateHeatTexture(mapChunkSize, mapData.heatMap, ref amplificationGradient));
+        } else if (drawMode == DrawMode.Moisture) {
+            display.DrawTexture(Biome.CreateMoistureTexture(mapChunkSize, mapData.moistureMap, ref amplificationGradient));
+        } else if (drawMode == DrawMode.Biome) {
+            display.DrawTexture(Biome.CreateBiomesTexture(mapChunkSize, mapData.biomesMap, ref biomeData));
+        }
+    }
 
 	public void RequestMapData(Vector2 centre, Action<MapData> callback) {
 		ThreadStart threadStart = delegate {
@@ -116,26 +125,23 @@ public class MapGenerator : MonoBehaviour {
 	}
 
 	MapData GenerateMapData(Vector2 centre) {
-		float[,] noiseMap = Noise.GenerateNoiseMap (mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.noiseScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, centre + noiseData.offset, noiseData.normalizeMode);
+		int heightNoiseDataIndex = 0;
+		int heatNoiseDataIndex = 1;
+		int moistureNoiseDataIndex = 2;
 
-		if (terrainData.useFalloff) {
+		int baseSeed = noiseData[heightNoiseDataIndex].seed;
+		noiseData[heatNoiseDataIndex].seed = baseSeed + 127;
+		noiseData[moistureNoiseDataIndex].seed = baseSeed + 255;
 
-			if (falloffMap == null) {
-				falloffMap = FalloffGenerator.GenerateFalloffMap (mapChunkSize + 2);
-			}
-			 
-			for (int y = 0; y < mapChunkSize+2; y++) {
-				for (int x = 0; x < mapChunkSize+2; x++) {
-					if (terrainData.useFalloff) {
-						noiseMap [x, y] = Mathf.Clamp01 (noiseMap [x, y] - falloffMap [x, y]);
-					}
-				
-				}
-			}
+		float[,] heightMap = Noise.GenerateNoiseMap (mapChunkSize + 2, mapChunkSize + 2, centre, noiseData[heightNoiseDataIndex]);
 
-		}
+        float[,] heatMap = Biome.CreateHeatNoise(mapChunkSize + 2, centre, ref noiseData[heatNoiseDataIndex], ref heightMap);
 
-		return new MapData (noiseMap);
+        float[,] moistureMap = Biome.CreateMoistureNoise(mapChunkSize + 2, centre, ref noiseData[moistureNoiseDataIndex], ref heightMap, ref heatMap, ref moistureHeightCurve);
+
+        int[,] biomesMap = Biome.CreateBiomesNoise(mapChunkSize + 2, ref heightMap, ref heatMap, ref moistureMap, ref biomeData);
+
+        return new MapData (heightMap, heatMap, moistureMap, biomesMap);
 	}
 
 	void OnValidate() {
@@ -144,10 +150,12 @@ public class MapGenerator : MonoBehaviour {
 			terrainData.OnValuesUpdated -= OnValuesUpdated;
 			terrainData.OnValuesUpdated += OnValuesUpdated;
 		}
-		if (noiseData != null) {
-			noiseData.OnValuesUpdated -= OnValuesUpdated;
-			noiseData.OnValuesUpdated += OnValuesUpdated;
-		}
+		for(int k = 0; k < noiseData.Length; k++) {
+            if (noiseData != null) {
+				noiseData[k].OnValuesUpdated -= OnValuesUpdated;
+				noiseData[k].OnValuesUpdated += OnValuesUpdated;
+            }
+        }
 		if (textureData != null) {
 			textureData.OnValuesUpdated -= OnTextureValuesUpdated;
 			textureData.OnValuesUpdated += OnTextureValuesUpdated;
@@ -172,10 +180,14 @@ public class MapGenerator : MonoBehaviour {
 
 public struct MapData {
 	public readonly float[,] heightMap;
+    public readonly float[,] heatMap;
+    public readonly float[,] moistureMap;
+    public readonly int[,] biomesMap;
 
-
-	public MapData (float[,] heightMap)
-	{
+    public MapData (float[,] heightMap, float[,] heatMap, float[,] moistureMap, int[,] biomesMap) {
 		this.heightMap = heightMap;
+		this.heatMap = heatMap;
+		this.moistureMap = moistureMap;
+		this.biomesMap = biomesMap;
 	}
 }

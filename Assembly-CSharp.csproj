@@ -68,9 +68,11 @@
     <Compile Include="Assets\Scripts\EndlessTerrain.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\MeshGenerator.cs" />
+    <Compile Include="Assets\Scripts\Biomes\Biome.cs" />
+    <Compile Include="Assets\Scripts\Data\BiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Scripts\Terrain.shader" />
+    <None Include="Assets\Materials\Terrain.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

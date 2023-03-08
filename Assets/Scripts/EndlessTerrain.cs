@@ -21,7 +21,9 @@ public class EndlessTerrain : MonoBehaviour {
 	int chunkSize;
 	int chunksVisibleInViewDst;
 
-	Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
+	public Shader terrainShader;
+
+    Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
 	static List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
 	void Start() {
@@ -66,7 +68,7 @@ public class EndlessTerrain : MonoBehaviour {
 					if (terrainChunkDictionary.ContainsKey (viewedChunkCoord)) {
 						terrainChunkDictionary [viewedChunkCoord].UpdateTerrainChunk ();
 					} else {
-						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial));
+						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial, terrainShader));
 					}
 				}
 
@@ -95,7 +97,7 @@ public class EndlessTerrain : MonoBehaviour {
 		int previousLODIndex = -1;
 		bool hasSetCollider;
 
-		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material) {
+		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material, Shader terrainShader) {
 			this.coord = coord;
 			this.detailLevels = detailLevels;
 			this.colliderLODIndex = colliderLODIndex;
@@ -108,9 +110,16 @@ public class EndlessTerrain : MonoBehaviour {
 			meshRenderer = meshObject.AddComponent<MeshRenderer>();
 			meshFilter = meshObject.AddComponent<MeshFilter>();
 			meshCollider = meshObject.AddComponent<MeshCollider>();
-			meshRenderer.material = material;
 
-			meshObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale;
+			Material mat = new Material(terrainShader);
+            material.SetFloat("r1", Random.Range(0f, 1f));
+            material.SetFloat("g1", Random.Range(0f, 1f));
+            material.SetFloat("b1", Random.Range(0f, 1f));
+			meshRenderer.material = material;
+            //textureData.ApplyToMaterial(mat);
+            //textureData.UpdateMeshHeights(mat, 0, 1);
+
+            meshObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale;
 			meshObject.transform.parent = parent;
 			meshObject.transform.localScale = Vector3.one * mapGenerator.terrainData.uniformScale;
 			SetVisible(false);

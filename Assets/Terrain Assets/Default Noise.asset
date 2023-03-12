@@ -15,11 +15,12 @@ MonoBehaviour:
   autoUpdate: 1
   name: Height
   normalizeMode: 1
-  noiseScale: 50
+  noiseScale: 500
   octaves: 6
   persistance: 0.49
   lacunarity: 2
   amplitude: 1
   frequency: 1
+  minLevel: 0
   seed: 0
-  offset: {x: 0, y: 0}
+  offset: {x: 135.16, y: 386.93}

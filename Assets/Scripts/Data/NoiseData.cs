@@ -10,11 +10,11 @@ public class NoiseData : UpdatableData {
 	public float noiseScale;
 
 	public int octaves;
-	[Range(0,1)]
 	public float persistance;
 	public float lacunarity;
 	public float amplitude;
 	public float frequency;
+	public float minLevel;
 
 
     public int seed;

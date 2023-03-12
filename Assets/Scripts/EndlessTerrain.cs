@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class EndlessTerrain : MonoBehaviour {
@@ -20,8 +19,6 @@ public class EndlessTerrain : MonoBehaviour {
 	static MapGenerator mapGenerator;
 	int chunkSize;
 	int chunksVisibleInViewDst;
-
-	public Shader terrainShader;
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
 	static List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
@@ -68,7 +65,7 @@ public class EndlessTerrain : MonoBehaviour {
 					if (terrainChunkDictionary.ContainsKey (viewedChunkCoord)) {
 						terrainChunkDictionary [viewedChunkCoord].UpdateTerrainChunk ();
 					} else {
-						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial, terrainShader));
+						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial));
 					}
 				}
 
@@ -78,7 +75,12 @@ public class EndlessTerrain : MonoBehaviour {
 
 	public class TerrainChunk {
 
-		public Vector2 coord;
+		public static int chunkSize = -1;
+		public static BiomeData biomeData = null;
+		public static Gradient amplificationGradient = null;
+		public static MapGenerator.DrawMode drawMode;
+
+        public Vector2 coord;
 
 		GameObject meshObject;
 		Vector2 position;
@@ -97,7 +99,20 @@ public class EndlessTerrain : MonoBehaviour {
 		int previousLODIndex = -1;
 		bool hasSetCollider;
 
-		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material, Shader terrainShader) {
+		void UpdateStaticValues() {
+			mapGenerator = FindObjectOfType<MapGenerator>();
+			drawMode = mapGenerator.drawMode;
+			biomeData = mapGenerator.biomeData;
+			amplificationGradient = mapGenerator.amplificationGradient;
+			chunkSize = mapGenerator.mapChunkSize;
+
+			Debug.Log("am fost aici lol");
+        }
+
+		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material) {
+			if(biomeData == null)
+				UpdateStaticValues();
+			
 			this.coord = coord;
 			this.detailLevels = detailLevels;
 			this.colliderLODIndex = colliderLODIndex;
@@ -111,14 +126,7 @@ public class EndlessTerrain : MonoBehaviour {
 			meshFilter = meshObject.AddComponent<MeshFilter>();
 			meshCollider = meshObject.AddComponent<MeshCollider>();
 
-			Material mat = new Material(terrainShader);
-            material.SetFloat("r1", Random.Range(0f, 1f));
-            material.SetFloat("g1", Random.Range(0f, 1f));
-            material.SetFloat("b1", Random.Range(0f, 1f));
 			meshRenderer.material = material;
-            //textureData.ApplyToMaterial(mat);
-            //textureData.UpdateMeshHeights(mat, 0, 1);
-
             meshObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale;
 			meshObject.transform.parent = parent;
 			meshObject.transform.localScale = Vector3.one * mapGenerator.terrainData.uniformScale;
@@ -134,20 +142,35 @@ public class EndlessTerrain : MonoBehaviour {
 			}
 
 			mapGenerator.RequestMapData(position,OnMapDataReceived);
-		}
+        }
 
 		void OnMapDataReceived(MapData mapData) {
 			this.mapData = mapData;
 			mapDataReceived = true;
 
-			UpdateTerrainChunk ();
-		}
+			Color[] colorMap = null;
+			if(drawMode == MapGenerator.DrawMode.Heat)
+				colorMap = Biome.CreateHeatColor(chunkSize, mapData.heatMap, ref amplificationGradient);
+			else if(drawMode == MapGenerator.DrawMode.Moisture)
+                colorMap = Biome.CreateMoistureColor(chunkSize, mapData.moistureMap, ref amplificationGradient);
+			else if(drawMode == MapGenerator.DrawMode.Biome)
+                colorMap = Biome.CreateBiomesColor(chunkSize, mapData.biomesMap, ref biomeData);
+			else if(drawMode == MapGenerator.DrawMode.NoiseMap) {
+                Texture2D texture = TextureGenerator.TextureFromHeightMap(mapData.heightMap);
+                meshRenderer.material.mainTexture = texture;
+            }
 
-		
+			if (colorMap != null) {
+				Texture2D texture = TextureGenerator.TextureFromColourMap(colorMap, chunkSize, chunkSize);
+				meshRenderer.material.mainTexture = texture;
+			}
+
+            UpdateTerrainChunk ();
+		}
 
 		public void UpdateTerrainChunk() {
 			if (mapDataReceived) {
-				float viewerDstFromNearestEdge = Mathf.Sqrt (bounds.SqrDistance (viewerPosition));
+                float viewerDstFromNearestEdge = Mathf.Sqrt (bounds.SqrDistance (viewerPosition));
 
 				bool wasVisible = IsVisible ();
 				bool visible = viewerDstFromNearestEdge <= maxViewDst;

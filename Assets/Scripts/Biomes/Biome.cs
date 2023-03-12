@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class Biome {
@@ -21,14 +22,20 @@ public static class Biome {
         return heatMap;
     }
 
-    public static Texture2D CreateHeatTexture(int mapChunkSize, float[,] heatNoise, ref Gradient amplificationGradient) {
-        Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
+    public static Color[] CreateHeatColor(int mapChunkSize, float[,] heatNoise, ref Gradient amplificationGradient) {
+        Color[] colorMap = new Color[mapChunkSize * mapChunkSize];
 
         for (int y = 0; y < mapChunkSize; y++) {
             for (int x = 0; x < mapChunkSize; x++) {
-                colourMap[y * mapChunkSize + x] = amplificationGradient.Evaluate(heatNoise[x, y]);
+                colorMap[y * mapChunkSize + x] = amplificationGradient.Evaluate(heatNoise[x, y]);
             }
         }
+
+        return colorMap;
+    }
+
+    public static Texture2D CreateHeatTexture(int mapChunkSize, float[,] heatNoise, ref Gradient amplificationGradient) {
+        Color[] colourMap = CreateHeatColor(mapChunkSize, heatNoise, ref amplificationGradient);
 
         return TextureGenerator.TextureFromColourMap(colourMap, mapChunkSize, mapChunkSize);
     }
@@ -58,7 +65,7 @@ public static class Biome {
         return moistureNoise;
     }
 
-    public static Texture2D CreateMoistureTexture(int mapChunkSize, float[,] moistureNoise, ref Gradient amplificationGradient) {
+    public static Color[] CreateMoistureColor(int mapChunkSize, float[,] moistureNoise, ref Gradient amplificationGradient) {
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
 
         for (int y = 0; y < mapChunkSize; y++) {
@@ -66,6 +73,12 @@ public static class Biome {
                 colourMap[y * mapChunkSize + x] = amplificationGradient.Evaluate(moistureNoise[x, y]);
             }
         }
+
+        return colourMap;
+    }
+
+    public static Texture2D CreateMoistureTexture(int mapChunkSize, float[,] moistureNoise, ref Gradient amplificationGradient) {
+        Color[] colourMap = CreateMoistureColor(mapChunkSize, moistureNoise, ref amplificationGradient);
 
         return TextureGenerator.TextureFromColourMap(colourMap, mapChunkSize, mapChunkSize);
     }
@@ -105,7 +118,7 @@ public static class Biome {
         return biomesNoise;
     }
 
-    public static Texture2D CreateBiomesTexture(int mapChunkSize, int[,] biomesMap, ref BiomeData biomeData) {
+    public static Color[] CreateBiomesColor(int mapChunkSize, int[,] biomesMap, ref BiomeData biomeData) {
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
 
         for (int y = 0; y < mapChunkSize; y++) {
@@ -113,6 +126,12 @@ public static class Biome {
                 colourMap[y * mapChunkSize + x] = biomeData.biomes[biomesMap[x, y]].color;
             }
         }
+
+        return colourMap;
+    }
+
+    public static Texture2D CreateBiomesTexture(int mapChunkSize, int[,] biomesMap, ref BiomeData biomeData) {
+        Color[] colourMap = CreateBiomesColor(mapChunkSize, biomesMap, ref biomeData);
 
         return TextureGenerator.TextureFromColourMap(colourMap, mapChunkSize, mapChunkSize);
     }

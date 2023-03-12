@@ -69,7 +69,7 @@ public class MapGenerator : MonoBehaviour {
 			return;
 		}
 
-        MapData mapData = GenerateMapData(Vector2.zero);
+        MapData mapData = GenerateMapData(noiseData[0].offset);
         MapDisplay display = FindObjectOfType<MapDisplay>();
 
         if (drawMode == DrawMode.Mesh) {
@@ -197,115 +197,42 @@ public class MapGenerator : MonoBehaviour {
 	int[] dx = new int[4] {-1, 0, 1, 0};
     int[] dy = new int[4] {0, 1, 0, -1};
 
+	public float eps;
+
     float[,] CreateNoiseMap(Vector2 centre, int heightNoiseDataIndex) {
         float[,] baseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, centre, noiseData[heightNoiseDataIndex]);
 
-		int flatNoiseDataIndex = 3;
-		noiseData[flatNoiseDataIndex].seed = noiseData[heightNoiseDataIndex].seed + 63;
-
-		float[,] flatMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, centre, noiseData[flatNoiseDataIndex]);
-
-		int lenghtRows = flatMap.GetLength(0);
-		int lenghtCols = flatMap.GetLength(1);
-
-		int maxINTDistance = 2000000;
-        Tuple<int, float>[,] mapDistances = new Tuple<int, float>[lenghtCols, lenghtRows];
-
-        for (int x = 0; x < lenghtRows; x++) {
-            for (int y = 0; y < lenghtCols; y++)
-                mapDistances[x, y] = new Tuple<int, float>(maxINTDistance, 0);
-        }
-
-        for (int x = 0; x < lenghtRows; x++) {
-            for (int y = 0; y < lenghtCols; y++) {
-				float oldValue = flatMap[x, y];
-                flatMap[x, y] = Mathf.Lerp(oceanLevel, oceanLevel + 0.3f, baseMap[x, y]);
-
-                if (baseMap[x, y] <= oceanLevel || oldValue <= noiseData[flatNoiseDataIndex].minLevel) {					
-					mapDistances[x, y] = new Tuple<int, float>(0, baseMap[x, y]);
-					flatMap[x, y] = 0;
-                } else {
-                    baseMap[x, y] = flatMap[x, y];
-                }
-            }
-        }
-
-        Queue<Vector2Int> Q = new Queue<Vector2Int>();
-        bool[,] inQ = new bool[lenghtRows, lenghtCols];
-
-        for (int x = 0; x < lenghtRows; x++) {
-			for (int y = 0; y < lenghtCols; y++) {
-
-				if (flatMap[x, y] != 0)
-					continue;
-
-                for (int d = 0; d < 4; d++) {
-                    Vector2Int nextPos = new Vector2Int(x + dx[d], y + dy[d]);
-
-                    if (nextPos.x < 0 || nextPos.x >= lenghtCols || nextPos.y < 0 || nextPos.y >= lenghtRows)
-                        continue;
-
-					if (flatMap[nextPos.x, nextPos.y] != 0) {
-						Q.Enqueue(new Vector2Int(x, y));
-						inQ[x, y] = true;
-						break;
-					}
-                }
+		int lengthR = baseMap.GetLength(0);
+		int lengthC = baseMap.GetLength(1);
+		float maxHeightFlat = 0.3f;
+		for(int x = 0; x < lengthR; x++) {
+			for(int y = 0; y < lengthC; y++) {
+				if (baseMap[x, y] >= oceanLevel)
+                    baseMap[x, y] = ConvertToRange(baseMap[x, y], oceanLevel, 1, oceanLevel, oceanLevel + maxHeightFlat);
             }
 		}
 
-		int maxDistance = 20;
-		int maxIteration = lenghtCols * lenghtRows * 5;
-		int currentIteration = 0;
+		int mountainNoiseDataIndex = 3;
+		noiseData[mountainNoiseDataIndex].seed = noiseData[heightNoiseDataIndex].seed + 63;
+		float[,] mountainMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, centre, noiseData[mountainNoiseDataIndex]);
 
-		int[,] freq = new int[lenghtRows, lenghtCols];
+		for (int x = 0; x < lengthR; x++) {
+			for (int y = 0; y < lengthC; y++) {
+                if (mountainMap[x, y] >= noiseData[mountainNoiseDataIndex].minLevel) {
 
-        while (Q.Count > 0) {
-            Vector2Int currentPos = Q.Dequeue();
-			inQ[currentPos.x, currentPos.y] = false;
-			freq[currentPos.x, currentPos.y]++;
+                    float val = ConvertToRange(mountainMap[x, y] - noiseData[mountainNoiseDataIndex].minLevel, 0, 1 - noiseData[mountainNoiseDataIndex].minLevel, 0, 1);
+					float addValue = (1 - oceanLevel - maxHeightFlat) * Mathf.Pow(1.5f * val, 1.4f);
 
-			currentIteration++;
-			if(currentIteration >= maxIteration) {
-				break;
-			}
-
-            if (mapDistances[currentPos.x, currentPos.y].Item1 + 1 > maxDistance)
-				continue;
-
-            for (int d = 0; d < 4; d++) {
-				Vector2Int nextPos = new Vector2Int(currentPos.x + dx[d], currentPos.y + dy[d]);
-
-				if (nextPos.x < 0 || nextPos.x >= lenghtCols || nextPos.y < 0 || nextPos.y >= lenghtRows)
-					continue;
-
-				if (mapDistances[nextPos.x, nextPos.y].Item1 < mapDistances[currentPos.x, currentPos.y].Item1 + 1)
-					continue;
-
-				mapDistances[nextPos.x, nextPos.y] = new Tuple<int, float>(mapDistances[currentPos.x, currentPos.y].Item1 + 1, mapDistances[currentPos.x, currentPos.y].Item2);
-
-				if (!inQ[nextPos.x, nextPos.y]) {
-					Q.Enqueue(nextPos);
-					inQ[nextPos.x, nextPos.y] = true;
-				}
-			}
-		}   
-
-		for (int y = 0; y < lenghtRows; y++) {
-			for(int x = 0; x < lenghtCols; x++) {
-				if (mapDistances[x, y].Item1 > 0 && mapDistances[x, y].Item1 != maxINTDistance) {
-					float newValue = mapDistances[x, y].Item2 + (flatMap[x, y] - mapDistances[x, y].Item2) * Mathf.Pow((float)mapDistances[x, y].Item1 / maxDistance, 1);
-					baseMap[x, y] = newValue;
-				}
-			}
+					//mountainMap[x, y] = addValue;
+					if (baseMap[x, y] + addValue > 1.5f)
+						baseMap[x, y] = 1.5f - (baseMap[x, y] + addValue - 1.5f);
+					else baseMap[x, y] = baseMap[x, y] + addValue;
+				} else mountainMap[x, y] = 0;
+            }
 		}
 
-        Debug.Log(currentIteration);
-        Debug.Log(maxIteration);
 
-        Q.Clear();
-
-        return baseMap;
+		return baseMap;
     }
 
 	float ConvertToRange(float oldValue, float oldMin, float oldMax, float newMin, float newMax) {

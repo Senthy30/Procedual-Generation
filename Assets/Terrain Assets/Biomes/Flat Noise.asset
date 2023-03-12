@@ -15,12 +15,12 @@ MonoBehaviour:
   autoUpdate: 0
   name: Flat
   normalizeMode: 1
-  noiseScale: 400
-  octaves: 3
-  persistance: 1
-  lacunarity: 1.25
-  amplitude: 1
+  noiseScale: 1000
+  octaves: 5
+  persistance: 0.5
+  lacunarity: 2.5
+  amplitude: 0.75
   frequency: 1
-  minLevel: 0.2
+  minLevel: 0.6
   seed: 63
   offset: {x: 0, y: 0}

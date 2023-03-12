@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4bed387465ae4ca48177143a455d1a8, type: 3}
   m_Name: Default Terrain
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   uniformScale: 2
   useFlatShading: 0
   useFalloff: 0
@@ -30,13 +30,31 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 2
-      outSlope: 2
+      time: 0.26952565
+      value: 0.16465068
+      inSlope: 0.28829452
+      outSlope: 0.28829452
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.1591093
+    - serializedVersion: 3
+      time: 0.5986412
+      value: 0.2286861
+      inSlope: 0.24540173
+      outSlope: 0.24540173
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.21753179
+    - serializedVersion: 3
+      time: 1.5012054
+      value: 0.7770009
+      inSlope: 0.05834687
+      outSlope: 0.05834687
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.209767
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

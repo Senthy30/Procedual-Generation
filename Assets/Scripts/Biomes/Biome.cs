@@ -12,10 +12,7 @@ public static class Biome {
         for (int y = 0; y < mapChunkSize; y++) {
             for (int x = 0; x < mapChunkSize; x++) {
                 heatMap[x, y] = Mathf.Clamp01(heatMap[x, y]);
-                //heatMap[x, y] = Mathf.Clamp(heatMap[x, y] - 1f / 4 * (heightMap[x, y] * heightMap[x, y]) * heatMap[x, y], 0, 0.999f);
-
-                float roundTo = ((int)(heatMap[x, y] * 10)) / 10f;
-                heatMap[x, y] = roundTo;
+                heatMap[x, y] = Mathf.Clamp(heatMap[x, y] - 1f / 4 * (heightMap[x, y] * heightMap[x, y]) * heatMap[x, y], 0, 0.999f);
             }
         }
 

@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fed09c6d65c454ce3a8d30092741aba8, type: 3}
   m_Name: Moisture Noise Data
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   name: Moisture
   normalizeMode: 1
-  noiseScale: 200
+  noiseScale: 400
   octaves: 5
   persistance: 2
   lacunarity: 1
   amplitude: 5
   frequency: 1
+  minLevel: 0
   seed: 255
   offset: {x: 0, y: 0}

@@ -69,6 +69,11 @@ MonoBehaviour:
     heat: 1
     moisture: 1
     height: 1
+  - name: Mountain Ice
+    color: {r: 1, g: 1, b: 1, a: 1}
+    heat: 1
+    moisture: 1
+    height: 2
   - name: Nothing
     color: {r: 0, g: 0, b: 0, a: 0}
     heat: 0

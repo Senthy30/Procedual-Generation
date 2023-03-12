@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fed09c6d65c454ce3a8d30092741aba8, type: 3}
   m_Name: Heat Noise Data
   m_EditorClassIdentifier: 
-  autoUpdate: 1
+  autoUpdate: 0
   name: Heat
   normalizeMode: 1
-  noiseScale: 500
+  noiseScale: 1000
   octaves: 3
-  persistance: 0.5
+  persistance: 0.4
   lacunarity: 2
   amplitude: 1
   frequency: 1
+  minLevel: 0
   seed: 127
   offset: {x: 0, y: 0}

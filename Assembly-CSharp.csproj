@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\MeshGenerator.cs" />
     <Compile Include="Assets\Scripts\Data\BiomeData.cs" />
+    <Compile Include="Assets\Scripts\Water\WaterReflection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

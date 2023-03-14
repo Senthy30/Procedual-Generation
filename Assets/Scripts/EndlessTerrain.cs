@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 public class EndlessTerrain : MonoBehaviour {
 
@@ -14,6 +15,9 @@ public class EndlessTerrain : MonoBehaviour {
 	public Transform viewer;
 	public Material mapMaterial;
 
+	public GameObject waterPrefab;
+	public Transform waterParent;
+
 	public static Vector2 viewerPosition;
 	Vector2 viewerPositionOld;
 	static MapGenerator mapGenerator;
@@ -23,7 +27,9 @@ public class EndlessTerrain : MonoBehaviour {
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
 	static List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
-	void Start() {
+    Dictionary<Vector2, WaterChunk> waterChunkDictionary = new Dictionary<Vector2, WaterChunk>();
+
+    void Start() {
 		mapGenerator = FindObjectOfType<MapGenerator> ();
 
 		maxViewDst = detailLevels [detailLevels.Length - 1].visibleDstThreshold;
@@ -66,11 +72,30 @@ public class EndlessTerrain : MonoBehaviour {
 						terrainChunkDictionary [viewedChunkCoord].UpdateTerrainChunk ();
 					} else {
 						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial));
+						waterChunkDictionary.Add(viewedChunkCoord, new WaterChunk(viewedChunkCoord, chunkSize, waterParent, waterPrefab));
 					}
 				}
 
 			}
 		}
+	}
+
+	public class WaterChunk {
+
+		GameObject waterObject;
+
+		Vector2 position;
+
+		public WaterChunk(Vector2 coord, int size, Transform waterParent, GameObject waterPrefab) {
+            position = coord * size;
+            Vector3 positionV3 = new Vector3(position.x, 0, position.y);
+
+            //waterObject = Instantiate (waterPrefab);
+			//waterObject.transform.localScale = 3.3f * Vector3.one * mapGenerator.terrainData.uniformScale;
+            //waterObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale + new Vector3(0, 98, 0);
+			//waterObject.transform.parent = waterParent.transform;
+        }
+
 	}
 
 	public class TerrainChunk {
@@ -105,8 +130,6 @@ public class EndlessTerrain : MonoBehaviour {
 			biomeData = mapGenerator.biomeData;
 			amplificationGradient = mapGenerator.amplificationGradient;
 			chunkSize = mapGenerator.mapChunkSize;
-
-			Debug.Log("am fost aici lol");
         }
 
 		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material) {

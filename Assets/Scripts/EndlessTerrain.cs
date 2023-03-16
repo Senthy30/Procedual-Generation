@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using UnityEditor.Rendering;
+using Unity.VisualScripting;
 
 public class EndlessTerrain : MonoBehaviour {
 
@@ -15,8 +17,11 @@ public class EndlessTerrain : MonoBehaviour {
 	public Transform viewer;
 	public Material mapMaterial;
 
-	public GameObject waterPrefab;
-	public Transform waterParent;
+    public GameObject waterPrefab;
+    public Transform waterParent;
+
+    public static GameObject _waterPrefab;
+	public static Transform _waterParent;
 
 	public static Vector2 viewerPosition;
 	Vector2 viewerPositionOld;
@@ -25,9 +30,7 @@ public class EndlessTerrain : MonoBehaviour {
 	int chunksVisibleInViewDst;
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
-	static List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
-
-    Dictionary<Vector2, WaterChunk> waterChunkDictionary = new Dictionary<Vector2, WaterChunk>();
+	public static List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
     void Start() {
 		mapGenerator = FindObjectOfType<MapGenerator> ();
@@ -37,6 +40,9 @@ public class EndlessTerrain : MonoBehaviour {
 		chunksVisibleInViewDst = Mathf.RoundToInt(maxViewDst / chunkSize);
 
 		UpdateVisibleChunks ();
+
+		_waterPrefab = waterPrefab;
+		_waterParent = waterParent;
 	}
 
 	void Update() {
@@ -55,47 +61,28 @@ public class EndlessTerrain : MonoBehaviour {
 	}
 		
 	void UpdateVisibleChunks() {
-		HashSet<Vector2> alreadyUpdatedChunkCoords = new HashSet<Vector2> ();
+		HashSet<Vector2> alreadyUpdatedTerrainChunkCoords = new HashSet<Vector2> ();
 		for (int i = visibleTerrainChunks.Count-1; i >= 0; i--) {
-			alreadyUpdatedChunkCoords.Add (visibleTerrainChunks [i].coord);
+            alreadyUpdatedTerrainChunkCoords.Add (visibleTerrainChunks [i].coord);
 			visibleTerrainChunks [i].UpdateTerrainChunk ();
-		}
-			
-		int currentChunkCoordX = Mathf.RoundToInt (viewerPosition.x / chunkSize);
+        }
+
+        int currentChunkCoordX = Mathf.RoundToInt (viewerPosition.x / chunkSize);
 		int currentChunkCoordY = Mathf.RoundToInt (viewerPosition.y / chunkSize);
 
 		for (int yOffset = -chunksVisibleInViewDst; yOffset <= chunksVisibleInViewDst; yOffset++) {
 			for (int xOffset = -chunksVisibleInViewDst; xOffset <= chunksVisibleInViewDst; xOffset++) {
 				Vector2 viewedChunkCoord = new Vector2 (currentChunkCoordX + xOffset, currentChunkCoordY + yOffset);
-				if (!alreadyUpdatedChunkCoords.Contains (viewedChunkCoord)) {
+
+                if (!alreadyUpdatedTerrainChunkCoords.Contains (viewedChunkCoord)) {
 					if (terrainChunkDictionary.ContainsKey (viewedChunkCoord)) {
 						terrainChunkDictionary [viewedChunkCoord].UpdateTerrainChunk ();
 					} else {
 						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial));
-						waterChunkDictionary.Add(viewedChunkCoord, new WaterChunk(viewedChunkCoord, chunkSize, waterParent, waterPrefab));
 					}
-				}
-
+                }
 			}
 		}
-	}
-
-	public class WaterChunk {
-
-		GameObject waterObject;
-
-		Vector2 position;
-
-		public WaterChunk(Vector2 coord, int size, Transform waterParent, GameObject waterPrefab) {
-            position = coord * size;
-            Vector3 positionV3 = new Vector3(position.x, 0, position.y);
-
-            //waterObject = Instantiate (waterPrefab);
-			//waterObject.transform.localScale = 3.3f * Vector3.one * mapGenerator.terrainData.uniformScale;
-            //waterObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale + new Vector3(0, 98, 0);
-			//waterObject.transform.parent = waterParent.transform;
-        }
-
 	}
 
 	public class TerrainChunk {
@@ -104,6 +91,10 @@ public class EndlessTerrain : MonoBehaviour {
 		public static BiomeData biomeData = null;
 		public static Gradient amplificationGradient = null;
 		public static MapGenerator.DrawMode drawMode;
+
+		public bool existWaterComplete;
+		public bool existWaterReceived;
+		public bool existWater;
 
         public Vector2 coord;
 
@@ -123,6 +114,8 @@ public class EndlessTerrain : MonoBehaviour {
 		bool mapDataReceived;
 		int previousLODIndex = -1;
 		bool hasSetCollider;
+
+		public GameObject waterObject;
 
 		void UpdateStaticValues() {
 			mapGenerator = FindObjectOfType<MapGenerator>();
@@ -193,6 +186,25 @@ public class EndlessTerrain : MonoBehaviour {
 
 		public void UpdateTerrainChunk() {
 			if (mapDataReceived) {
+				if (!existWaterReceived) {
+					for (int x = 0; x < mapData.heightMap.GetLength(0); x++) {
+						for (int y = 0; y < mapData.heightMap.GetLength(1); y++) {
+							if (mapData.heightMap[x, y] < mapGenerator.oceanLevel) {
+								existWater = true;
+                                break;
+							}
+						}
+
+						if (existWater)
+							break;
+					}
+					existWaterReceived = true;
+
+                    if (!existWater)
+						existWaterComplete = true;
+                }
+				WaterChunk();
+
                 float viewerDstFromNearestEdge = Mathf.Sqrt (bounds.SqrDistance (viewerPosition));
 
 				bool wasVisible = IsVisible ();
@@ -252,8 +264,31 @@ public class EndlessTerrain : MonoBehaviour {
 			}
 		}
 
-		public void SetVisible(bool visible) {
+        public void WaterChunk() {
+			if (existWaterComplete || !existWaterReceived || (existWaterReceived && !existWater))
+				return;
+
+            Vector3 positionV3 = new Vector3(position.x, 0, position.y);
+
+            waterObject = Instantiate(_waterPrefab);
+            waterObject.transform.localScale = 3.32f * Vector3.one * mapGenerator.terrainData.uniformScale;
+            waterObject.transform.position = positionV3 * mapGenerator.terrainData.uniformScale + new Vector3(0, 24.5f, 0);
+
+            Material material = new Material(waterObject.GetComponent<Renderer>().material);
+            material.SetVector("_Offset_World", coord);
+			material.SetFloat("Vector1_6269b1025b26473ca8bc61634f34b537", DayNightCycle.GetSmoothnessCurveAtCurrentTime());
+            waterObject.GetComponent<Renderer>().material = material;
+
+            waterObject.transform.parent = _waterParent.transform;
+			waterObject.gameObject.SetActive(false);
+			existWaterComplete = true;
+        }
+
+        public void SetVisible(bool visible) {
 			meshObject.SetActive (visible);
+			if (waterObject != null) {
+				waterObject.SetActive(visible);
+			}
 		}
 
 		public bool IsVisible() {

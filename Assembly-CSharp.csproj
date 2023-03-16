@@ -56,6 +56,7 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\DayNightCycle\DayNightCycle.cs" />
     <Compile Include="Assets\Scripts\Biomes\Biome.cs" />
     <Compile Include="Assets\Scripts\Data\TerrainData.cs" />
     <Compile Include="Assets\Scripts\Data\NoiseData.cs" />
@@ -67,9 +68,9 @@
     <Compile Include="Assets\Scripts\Noise.cs" />
     <Compile Include="Assets\Scripts\EndlessTerrain.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
+    <Compile Include="Assets\Scripts\Water\WaterReflection.cs" />
     <Compile Include="Assets\Scripts\MeshGenerator.cs" />
     <Compile Include="Assets\Scripts\Data\BiomeData.cs" />
-    <Compile Include="Assets\Scripts\Water\WaterReflection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

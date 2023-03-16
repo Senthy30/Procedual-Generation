@@ -181,6 +181,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else
             {
+                m_RigidBody.velocity = new Vector3(m_RigidBody.velocity.x, m_RigidBody.velocity.y - 2f, m_RigidBody.velocity.z);
                 m_RigidBody.drag = 0f;
                 if (m_PreviouslyGrounded && !m_Jumping)
                 {

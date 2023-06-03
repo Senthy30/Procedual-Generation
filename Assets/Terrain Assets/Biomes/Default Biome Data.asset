@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1b3dace1e78aec42bbe0243f23c2904, type: 3}
+  m_Name: Default Biome Data
+  m_EditorClassIdentifier: 
+  autoUpdate: 0
+  biomes:
+  - name: Cold Ocean
+    color: {r: 0.56289303, g: 0.7049527, b: 1, a: 1}
+    heat: 0.15
+    moisture: 1
+    height: 0.27
+  - name: Temperate Ocean
+    color: {r: 0.25157225, g: 0.4943056, b: 1, a: 1}
+    heat: 0.85
+    moisture: 1
+    height: 0.27
+  - name: Tropical Ocean
+    color: {r: 0.30980396, g: 0.3291231, b: 1, a: 1}
+    heat: 1
+    moisture: 1
+    height: 0.27
+  - name: Sand
+    color: {r: 0.8301887, g: 0.77626675, b: 0.45947546, a: 1}
+    heat: 1
+    moisture: 1
+    height: 0.29
+  - name: Ice
+    color: {r: 0.9308176, g: 0.9484973, b: 1, a: 1}
+    heat: 0.15
+    moisture: 1
+    height: 1
+  - name: Tundra
+    color: {r: 0.3764706, g: 0.5137255, b: 0.4745098, a: 1}
+    heat: 0.3
+    moisture: 1
+    height: 1
+  - name: Grassland
+    color: {r: 0.5319534, g: 0.764151, b: 0.33641863, a: 1}
+    heat: 0.7
+    moisture: 0.5
+    height: 1
+  - name: Forest
+    color: {r: 0.26899344, g: 0.764151, b: 0.24270196, a: 1}
+    heat: 0.7
+    moisture: 1
+    height: 1
+  - name: Desert
+    color: {r: 1, g: 1, b: 0, a: 0}
+    heat: 1
+    moisture: 0.4
+    height: 1
+  - name: Savanna
+    color: {r: 0.85490197, g: 0.7059974, b: 0.3960784, a: 1}
+    heat: 1
+    moisture: 0.7
+    height: 1
+  - name: Jungle
+    color: {r: 0.07450981, g: 0.36862746, b: 0.27450982, a: 1}
+    heat: 1
+    moisture: 1
+    height: 1
+  - name: Mountain Ice
+    color: {r: 1, g: 1, b: 1, a: 1}
+    heat: 1
+    moisture: 1
+    height: 2
+  - name: Nothing
+    color: {r: 0, g: 0, b: 0, a: 0}
+    heat: 0
+    moisture: 0
+    height: 0

@@ -379,6 +379,7 @@
 "Assets/Scripts/Noise.cs"
 "Assets/Scripts/Player/MouseLook.cs"
 "Assets/Scripts/Player/RigidbodyFirstPersonController.cs"
+"Assets/Scripts/SpawnerScript.cs"
 "Assets/Scripts/TextureGenerator.cs"
 "Assets/Scripts/Water.cs"
 "Assets/Scripts/Water/WaterReflection.cs"

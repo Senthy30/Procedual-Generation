@@ -77,6 +77,7 @@
     <Compile Include="Assets\Scripts\Water\WaterReflection.cs" />
     <Compile Include="Assets\Scripts\MeshGenerator.cs" />
     <Compile Include="Assets\Scripts\Data\BiomeData.cs" />
+    <Compile Include="Assets\Scripts\SpawnerScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -5,6 +5,13 @@ using UnityEngine.AI;
 
 public class AIMovementScript : MonoBehaviour
 {
+    public float hp = 3f;
+
+    private bool isDead = false;
+    private float deathAnimationSpeed = 5f;
+
+    public GameObject[] ItemsDeadState = null;
+
     public float moveSpeed = 1f;
     public float rotSpeed = 5f;
 
@@ -17,28 +24,39 @@ public class AIMovementScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isWandering == false)
+        if (isDead == false)
         {
-            StartCoroutine(Wander());
+            if (isWandering == false)
+            {
+                StartCoroutine(Wander());
+            }
+            if (isRotatingRight == true)
+            {
+                gameObject.GetComponent<Animator>().Play("Idle");
+                transform.Rotate(transform.up * Time.deltaTime * rotSpeed);
+            }
+            if (isRotatingLeft == true)
+            {
+                gameObject.GetComponent<Animator>().Play("Idle");
+                transform.Rotate(transform.up * Time.deltaTime * -rotSpeed);
+            }
+            if (isWalking == true)
+            {
+                gameObject.GetComponent<Animator>().Play("Walk");
+                transform.position += transform.forward * moveSpeed * Time.deltaTime;
+            }
+            if (isEating == true)
+            {
+                gameObject.GetComponent<Animator>().Play("Eat");
+            }
         }
-        if (isRotatingRight == true)
+        
+        else
         {
             gameObject.GetComponent<Animator>().Play("Idle");
-            transform.Rotate(transform.up * Time.deltaTime * rotSpeed);
-        }
-        if (isRotatingLeft == true)
-        {
-            gameObject.GetComponent<Animator>().Play("Idle");
-            transform.Rotate(transform.up * Time.deltaTime * -rotSpeed);
-        }
-        if (isWalking == true)
-        {
-            gameObject.GetComponent<Animator>().Play("Walk");
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
-        }
-        if (isEating == true)
-        {
-            gameObject.GetComponent<Animator>().Play("Eat");
+
+            Quaternion targetQuaternion = Quaternion.Euler(0, 0, 90);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetQuaternion, deathAnimationSpeed * Time.deltaTime);
         }
     }
 
@@ -93,5 +111,35 @@ public class AIMovementScript : MonoBehaviour
         }
 
         isWandering = false;
+    }
+
+    private void OnMouseDown()
+    {
+        if (!isDead)
+        {
+            if (hp > 0)
+            {
+                hp -= 1;
+            }
+
+            if (hp == 0)
+            {
+                isDead = true;
+                Invoke("ShowItemsDeadState", 3f);
+            }
+
+        }
+    }
+
+    private void ShowItemsDeadState()
+    {
+        foreach (var item in ItemsDeadState)
+        {
+            item.SetActive(true);
+        }
+
+        Destroy(GetComponent<BoxCollider>());
+
+        transform.Find("mesh").GetComponent<SkinnedMeshRenderer>().enabled = false;
     }
 }

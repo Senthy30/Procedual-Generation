@@ -97,7 +97,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_GroundContactNormal;
         private bool m_Jump, m_PreviouslyGrounded, m_Jumping, m_IsGrounded;
         public hpBar hpScript;
-
+        public Inventory inventory;
 
         public Vector3 Velocity
         {
@@ -496,6 +496,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (!m_PreviouslyGrounded && m_IsGrounded && m_Jumping)
             {
                 m_Jumping = false;
+            }
+        }
+
+        void OnCollisionEnter(Collision hit)
+        { 
+            IInventoryItem item = hit.collider.GetComponent<IInventoryItem>();
+            Debug.Log("Collide");
+            if(item != null)
+            {
+                Debug.Log("Item gasit");
+                inventory.AddItem(item);
             }
         }
     }

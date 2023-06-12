@@ -401,6 +401,7 @@
 "Assets/Scripts/Items/InventoryItemBase.cs"
 "Assets/Scripts/Items/InventorySlot.cs"
 "Assets/Scripts/Items/ObiectInventar.cs"
+"Assets/Scripts/Items/SlotButtonHandler.cs"
 "Assets/Scripts/MapDisplay.cs"
 "Assets/Scripts/MapGenerator.cs"
 "Assets/Scripts/MeshGenerator.cs"

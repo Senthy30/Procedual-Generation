@@ -375,6 +375,7 @@
 "Assets/Scripts/MapDisplay.cs"
 "Assets/Scripts/MapGenerator.cs"
 "Assets/Scripts/MeshGenerator.cs"
+"Assets/Scripts/Mobs & Animals/AIEnemyScript.cs"
 "Assets/Scripts/Mobs & Animals/AIMovementScript.cs"
 "Assets/Scripts/Mobs & Animals/SpawnerScript.cs"
 "Assets/Scripts/Noise.cs"

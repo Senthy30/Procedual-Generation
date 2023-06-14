@@ -498,5 +498,30 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jumping = false;
             }
         }
+
+        private float currentTime;
+
+        private void OnCollisionStay(Collision collision)
+        {
+            
+
+            if (collision.collider.gameObject.CompareTag("Enemy"))
+            {
+                if (currentTime > 0)
+                {
+                    currentTime -= Time.deltaTime;
+                }
+
+                Debug.Log(currentTime);
+
+                if (currentTime <= 0)
+                {
+                    hpScript.health -= collision.gameObject.GetComponent<AIEnemyScript>().damage;
+
+                    hpScript.UpdateHpBar();
+                    currentTime = 0.5f;
+                }
+            }
+        }
     }
 }

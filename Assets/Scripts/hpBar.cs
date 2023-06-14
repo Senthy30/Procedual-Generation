@@ -59,14 +59,13 @@ public class hpBar : MonoBehaviour
         }
     }
 
-    public void FallDamage(float damageTaken){
+    public void FallDamage(float damageTaken)
+    {
         health -= damageTaken;
         UpdateHpBar();
     }
 
-    void UpdateHpBar(){
+    public void UpdateHpBar() {
         HPBar.value = health;
     }
-
-
 }

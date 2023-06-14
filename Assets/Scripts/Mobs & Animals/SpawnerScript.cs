@@ -20,7 +20,7 @@ public class SpawnerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        dayNightCycle = FindFirstObjectByType<DayNightCycle>();
+        dayNightCycle = FindObjectOfType<DayNightCycle>();
     }
     private void Update()
     {

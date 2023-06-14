@@ -64,14 +64,14 @@
     <Compile Include="Assets\Scripts\Data\NoiseData.cs" />
     <Compile Include="Assets\Scripts\Player\RigidbodyFirstPersonController.cs" />
     <Compile Include="Assets\Scripts\MapGenerator.cs" />
-    <Compile Include="Assets\Scripts\Animals\SpawnerScript.cs" />
+    <Compile Include="Assets\Scripts\Mobs &amp; Animals\SpawnerScript.cs" />
     <Compile Include="Assets\Scripts\Data\UpdatableData.cs" />
     <Compile Include="Assets\Scripts\MapDisplay.cs" />
     <Compile Include="Assets\Scripts\Water.cs" />
     <Compile Include="Assets\Scripts\HideOnPlay.cs" />
     <Compile Include="Assets\Scripts\FalloffGenerator.cs" />
     <Compile Include="Assets\Scripts\Noise.cs" />
-    <Compile Include="Assets\Scripts\Animals\AIMovementScript.cs" />
+    <Compile Include="Assets\Scripts\Mobs &amp; Animals\AIMovementScript.cs" />
     <Compile Include="Assets\Scripts\EndlessTerrain.cs" />
     <Compile Include="Assets\Scripts\TextureGenerator.cs" />
     <Compile Include="Assets\Scripts\hpBar.cs" />

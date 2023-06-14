@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
-using UnityEditor.Rendering;
-using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 public class EndlessTerrain : MonoBehaviour {
 
@@ -22,6 +21,10 @@ public class EndlessTerrain : MonoBehaviour {
 
     public static GameObject _waterPrefab;
 	public static Transform _waterParent;
+
+	public TerrainData terrainData;
+
+	public GameObject[] treeGameObject;
 
 	public static Vector2 viewerPosition;
 	Vector2 viewerPositionOld;
@@ -78,7 +81,9 @@ public class EndlessTerrain : MonoBehaviour {
 					if (terrainChunkDictionary.ContainsKey (viewedChunkCoord)) {
 						terrainChunkDictionary [viewedChunkCoord].UpdateTerrainChunk ();
 					} else {
-						terrainChunkDictionary.Add (viewedChunkCoord, new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial));
+						terrainChunkDictionary.Add (viewedChunkCoord, 
+							new TerrainChunk (viewedChunkCoord, chunkSize, detailLevels, colliderLODIndex, transform, mapMaterial, terrainData, treeGameObject)
+						);
 					}
                 }
 			}
@@ -92,6 +97,9 @@ public class EndlessTerrain : MonoBehaviour {
 		public static Gradient amplificationGradient = null;
 		public static MapGenerator.DrawMode drawMode;
 
+		private static GameObject[] treeGameObject;
+
+		public bool resourcesComplete;
 		public bool existWaterComplete;
 		public bool existWaterReceived;
 		public bool existWater;
@@ -116,22 +124,25 @@ public class EndlessTerrain : MonoBehaviour {
 		bool hasSetCollider;
 
 		public GameObject waterObject;
+		public TerrainData terrainData;
 
-		void UpdateStaticValues() {
+		void UpdateStaticValues(GameObject[] trGameObject) {
 			mapGenerator = FindObjectOfType<MapGenerator>();
 			drawMode = mapGenerator.drawMode;
 			biomeData = mapGenerator.biomeData;
 			amplificationGradient = mapGenerator.amplificationGradient;
 			chunkSize = mapGenerator.mapChunkSize;
+            treeGameObject = trGameObject;
         }
 
-		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material) {
+		public TerrainChunk(Vector2 coord, int size, LODInfo[] detailLevels, int colliderLODIndex, Transform parent, Material material, TerrainData terrainData, GameObject[] trGameObject) {
 			if(biomeData == null)
-				UpdateStaticValues();
+				UpdateStaticValues(trGameObject);
 			
 			this.coord = coord;
 			this.detailLevels = detailLevels;
 			this.colliderLODIndex = colliderLODIndex;
+			this.terrainData = terrainData;
 
 			position = coord * size;
 			bounds = new Bounds(position,Vector2.one * size);
@@ -203,8 +214,11 @@ public class EndlessTerrain : MonoBehaviour {
                     if (!existWater)
 						existWaterComplete = true;
                 }
-				WaterChunk();
 
+				WaterChunk();
+				ResourcesChunck();
+
+               
                 float viewerDstFromNearestEdge = Mathf.Sqrt (bounds.SqrDistance (viewerPosition));
 
 				bool wasVisible = IsVisible ();
@@ -263,6 +277,75 @@ public class EndlessTerrain : MonoBehaviour {
 				}
 			}
 		}
+
+        GameObject SpawnOakBush(int x, int y, TreeTypes treeTypes) {
+			int length = treeTypes.prob.Length;
+            int stIdx = treeTypes.startIdx;
+			int maxValue = treeTypes.prob[length - 1];
+
+			int type = 0;
+			int randomValue = (Mathf.Abs(x) + Mathf.Abs(y)) % (maxValue + 1);
+
+			for(int i = 0; i < length; i++) 
+				if (randomValue <= treeTypes.prob[i]) {
+					type = stIdx + i;
+					break;
+				}
+
+            if (type == 11) {
+                randomValue = (Mathf.Abs(x) + Mathf.Abs(y)) * 1001593 % 100;
+
+				if (randomValue <= 95)
+					return null;
+            }
+
+            GameObject tree = Instantiate(treeGameObject[type], meshObject.transform);
+
+			randomValue = (Mathf.Abs(x) + Mathf.Abs(y)) * 1001593 % 360;
+			tree.transform.rotation = Quaternion.Euler(
+					tree.transform.rotation.eulerAngles.x,
+					randomValue,
+                    tree.transform.rotation.eulerAngles.z
+                );
+
+            return tree;
+        }
+
+        public void ResourcesChunck() {
+			if (resourcesComplete)
+				return;
+            resourcesComplete = true;
+
+			TreeTypes[] treeTypes = new TreeTypes[3] {
+				new TreeTypes(0, new int[7] {7, 14, 18, 20, 21, 22, 23}),
+                new TreeTypes(7, new int[4] {4, 8, 14, 17}),
+                new TreeTypes(11, new int[1] {10})
+            };
+
+            int stIdx = 5;
+            int lengthR = mapData.treesMap.GetLength(0);
+            int lengthC = mapData.treesMap.GetLength(1);
+            for (int x = stIdx; x < lengthR; x++) {
+                for (int y = stIdx; y < lengthC; y++) {
+                    if (mapData.treesMap[x, y] != 1)
+                        continue;
+
+                    float height = terrainData.meshHeightCurve.Evaluate(mapData.heightMap[x, y]) * terrainData.meshHeightMultiplier;
+					GameObject obj = null;
+                    
+					if (mapData.biomesMap[x, y] == 7) {
+						obj = SpawnOakBush(x, y, treeTypes[0]);
+                    } else if (mapData.biomesMap[x, y] == 5) {
+                        obj = SpawnOakBush(x, y, treeTypes[1]);
+                    } else if(mapData.biomesMap[x, y] == 8) {
+                        obj = SpawnOakBush(x, y, treeTypes[2]);
+                    }
+
+                    if(obj != null)
+						obj.transform.localPosition = new Vector3(-lengthR / 2 + x, height, lengthC / 2 - y);
+                }
+            }
+        }
 
         public void WaterChunk() {
 			if (existWaterComplete || !existWaterReceived || (existWaterReceived && !existWater))
@@ -334,6 +417,17 @@ public class EndlessTerrain : MonoBehaviour {
 			get {
 				return visibleDstThreshold * visibleDstThreshold;
 			}
+		}
+	}
+
+	[System.Serializable]
+	public struct TreeTypes {
+		public int startIdx;
+		public int[] prob;
+
+		public TreeTypes(int startIdx, int[] prob) {
+			this.startIdx = startIdx;
+			this.prob = prob;
 		}
 	}
 

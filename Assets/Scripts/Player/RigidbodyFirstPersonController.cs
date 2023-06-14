@@ -502,10 +502,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         void OnCollisionEnter(Collision hit)
         { 
             IInventoryItem item = hit.collider.GetComponent<IInventoryItem>();
-            Debug.Log("Collide");
-            if(item != null)
-            {
-                Debug.Log("Item gasit");
+            if(item != null) {
                 inventory.AddItem(item);
             }
         }

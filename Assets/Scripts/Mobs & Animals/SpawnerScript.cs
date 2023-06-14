@@ -11,18 +11,37 @@ public class SpawnerScript : MonoBehaviour
 
     public float spawnAnimalsTime;
     public float spawnMobsTime;
-    int randAnimal;
-    bool isDay;
+    private int randAnimal;
+    
+    private bool isDay;
+    private bool isSpawning = false;
+    private DayNightCycle dayNightCycle;
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(spawn());
+        dayNightCycle = FindFirstObjectByType<DayNightCycle>();
+    }
+    private void Update()
+    {
+        if (dayNightCycle.currentTimeEditorMode > 0 && dayNightCycle.currentTimeEditorMode < 750)
+        {
+            isDay = true;
+        }
+        else
+        {
+            isDay = false;
+        }
+
+        if (isSpawning == false)
+        {
+            StartCoroutine(spawn());
+        }
     }
 
     IEnumerator spawn()
     {
-        isDay = true;
+        isSpawning = true;
         while (isDay)
         {
             yield return new WaitForSeconds(spawnAnimalsTime);
@@ -30,7 +49,6 @@ public class SpawnerScript : MonoBehaviour
             if (randAnimal == 0)
             {
                 Instantiate(cowPrefab, transform.position, Quaternion.identity);
-
             }
             if (randAnimal == 1)
             {
@@ -43,5 +61,12 @@ public class SpawnerScript : MonoBehaviour
 
             }
         }
+
+        while (!isDay)
+        {
+            yield return new WaitForSeconds(spawnMobsTime);
+            Instantiate(zombiePrefab, transform.position, Quaternion.identity);
+        }
+        isSpawning = false;
     }
 }

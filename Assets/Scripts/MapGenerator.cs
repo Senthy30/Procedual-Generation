@@ -9,7 +9,7 @@ public class MapGenerator : MonoBehaviour {
 	public enum SizeMode { Small, Big};
 	public SizeMode sizeMode;
 
-	public enum DrawMode {NoiseMap, Mesh, Heat, Moisture, Biome};
+	public enum DrawMode {NoiseMap, Mesh, Heat, Moisture, Biome, Trees};
 	public DrawMode drawMode;
 
 	public float oceanLevel;
@@ -17,6 +17,8 @@ public class MapGenerator : MonoBehaviour {
 	public TerrainData terrainData;
 	public NoiseData[] noiseData;
 	public BiomeData biomeData;
+
+	public ResourcesData[] resourcesData;
 
     public Material terrainMaterial, editorMapMaterial;
 
@@ -34,7 +36,6 @@ public class MapGenerator : MonoBehaviour {
 
 	Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
 	Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
-
 
 	void Awake() {
         biomeData.biomes[0].height = oceanLevel;
@@ -88,6 +89,8 @@ public class MapGenerator : MonoBehaviour {
             display.DrawTexture(Biome.CreateMoistureTexture(mapChunkSize, mapData.moistureMap, ref amplificationGradient));
         } else if (drawMode == DrawMode.Biome) {
             display.DrawTexture(Biome.CreateBiomesTexture(mapChunkSize, mapData.biomesMap, ref biomeData));
+        } else if (drawMode == DrawMode.Trees) {
+            display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData.treesMap));
         }
     }
 
@@ -191,13 +194,56 @@ public class MapGenerator : MonoBehaviour {
 
         int[,] biomesMap = Biome.CreateBiomesNoise(mapChunkSize + 2, ref heightMap, ref heatMap, ref moistureMap, ref biomeData);
 
-        return new MapData (heightMap, heatMap, moistureMap, biomesMap);
+		int treesIndex = 0;
+
+		float[,] treesMap = CreateResourcesNoiseMap(centre, heightNoiseDataIndex, resourcesData[treesIndex].offsetSeed, resourcesData[treesIndex].rarity);
+
+        return new MapData (heightMap, heatMap, moistureMap, biomesMap, treesMap);
 	}
 
 	int[] dx = new int[4] {-1, 0, 1, 0};
     int[] dy = new int[4] {0, 1, 0, -1};
 
 	public float eps;
+
+	float[,] CreateResourcesNoiseMap(Vector2 centre, int heightNoiseDataIndex, int offSetSeed, float rarity) {
+		int resourcesNoiseDataIndex = 4;
+
+		noiseData[resourcesNoiseDataIndex].seed = noiseData[heightNoiseDataIndex].seed + offSetSeed;
+        float[,] baseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, centre, noiseData[resourcesNoiseDataIndex]);
+
+        int lengthR = baseMap.GetLength(0);
+        int lengthC = baseMap.GetLength(1);
+		int marginAround = 4;
+
+        int stIdx = 5;
+
+        for (int x = stIdx; x < lengthR; x++) {
+			for(int y = stIdx; y < lengthC; y++) {
+
+				if (baseMap[x, y] < rarity) {
+                    baseMap[x, y] = 0;
+                    continue;
+                }
+
+				baseMap[x, y] = 1;
+				
+				for(int i = x - marginAround; i <= x + marginAround; i++) {
+					if(i < 0 || i >= lengthR)
+						continue;
+					for(int j = y - marginAround; j <= y + marginAround; j++) {
+						if(j < 0 || j >= lengthC)
+							continue;
+						if (baseMap[i, j] == 1)
+							continue;
+                        baseMap[i, j] = 0;
+					}
+				}
+			}
+		}
+
+        return baseMap;
+    }
 
     float[,] CreateNoiseMap(Vector2 centre, int heightNoiseDataIndex) {
         float[,] baseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, centre, noiseData[heightNoiseDataIndex]);
@@ -278,10 +324,26 @@ public struct MapData {
     public readonly float[,] moistureMap;
     public readonly int[,] biomesMap;
 
-    public MapData (float[,] heightMap, float[,] heatMap, float[,] moistureMap, int[,] biomesMap) {
+    public readonly float[,] treesMap;
+
+    public MapData (float[,] heightMap, float[,] heatMap, float[,] moistureMap, int[,] biomesMap, float[,] treesMap) {
 		this.heightMap = heightMap;
 		this.heatMap = heatMap;
 		this.moistureMap = moistureMap;
 		this.biomesMap = biomesMap;
+		this.treesMap = treesMap;
+	}
+}
+
+[Serializable]
+public struct ResourcesData {
+	public String name;
+	public int offsetSeed;
+	public float rarity;
+
+	public ResourcesData(String name, int offsetSeed, float rarity) {
+		this.name = name;
+		this.offsetSeed = offsetSeed;
+		this.rarity = rarity;
 	}
 }

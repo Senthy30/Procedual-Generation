@@ -97,7 +97,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_GroundContactNormal;
         private bool m_Jump, m_PreviouslyGrounded, m_Jumping, m_IsGrounded;
         public hpBar hpScript;
-
+        public Inventory inventory;
 
         public Vector3 Velocity
         {
@@ -499,6 +499,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
+<<<<<<< HEAD
+        void OnCollisionEnter(Collision hit)
+        { 
+            IInventoryItem item = hit.collider.GetComponent<IInventoryItem>();
+            if(item != null) {
+                inventory.AddItem(item);
+=======
         private float currentTime;
 
         private void OnCollisionStay(Collision collision)
@@ -521,6 +528,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     hpScript.UpdateHpBar();
                     currentTime = 0.5f;
                 }
+>>>>>>> Mobs
             }
         }
     }

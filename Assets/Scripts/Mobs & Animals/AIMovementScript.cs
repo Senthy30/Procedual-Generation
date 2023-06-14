@@ -49,6 +49,18 @@ public class AIMovementScript : MonoBehaviour
             {
                 gameObject.GetComponent<Animator>().Play("Eat");
             }
+
+            float xRot = transform.rotation.eulerAngles.x;
+            if (transform.rotation.eulerAngles.y != 0 || transform.rotation.eulerAngles.z != 0 || Mathf.Abs(xRot) > 35)
+            {   
+                if(Mathf.Abs(xRot) > 35)
+                {
+                    xRot = 34.95f;
+                    if (xRot < 0)
+                        xRot *= -1;
+                }
+                // transform.rotation = Quaternion.EulerAngles(new Vector3(xRot, 0, 0));
+            }
         }
         
         else

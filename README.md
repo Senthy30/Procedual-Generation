@@ -1,10 +1,10 @@
 #  EMDIS-survival - survival game
 
 ## Team members
-Cringanu Denis-Florin
-Cristea Petru-Theodor
-Petre Vasile-Eduard
-Totolici Alexandru-Gabriel
+- Cringanu Denis-Florin
+- Cristea Petru-Theodor
+- Petre Vasile-Eduard
+- Totolici Alexandru-Gabriel
 
 ## User stories
 1. As a player, i want this game to be in a first person view.
@@ -68,6 +68,6 @@ Totolici Alexandru-Gabriel
 ##  Demo
 
 ## Software-uri folosite
-Unity
-Microsoft Visual Studio
-Blender
+- Unity
+- Microsoft Visual Studio
+- Blender

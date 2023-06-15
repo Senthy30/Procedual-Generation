@@ -64,6 +64,9 @@
 
 ## Folosirea unui tool de AI care ajuta in timpul dezvoltarii software
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/55ff226a-e9a5-409a-bcee-792253bc1811)
+![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/c8b797cb-e8d9-427a-8f5f-ca770542b1ee)
+![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/17940d76-f566-4d9e-9fb3-8c87343ee796)
+
 
 ##  Demo
 

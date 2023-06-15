@@ -1,12 +1,12 @@
-##  EMDIS-survival - survival game
+#  EMDIS-survival - survival game
 
-# Team members
+## Team members
 Cringanu Denis-Florin
 Cristea Petru-Theodor
 Petre Vasile-Eduard
 Totolici Alexandru-Gabriel
 
-# User stories
+## User stories
 1. As a player, i want this game to be in a first person view.
 2. As a player, i want to be able to move using W A S D.
 3. As a player, i want to be able to jump.
@@ -36,29 +36,29 @@ Totolici Alexandru-Gabriel
 28. As a player, I want to exist ores in the world, as stone and iron can spawn procedurally.
 29. As a player, I want to have the ability to mine, chop or damage specific objects based on what I currently have in hand.
 
-# Backlog creation
+## Backlog creation
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/eac19460-cb86-4d4c-97be-03b14f0fc579)
 
-# Diagrame
+## Diagrame
 
-# Source control cu git
+## Source control cu git
 [branch creation, merge/rebase, pull requests, minim 10 commits}(https://github.com/Senthy30/Procedual-Generation/commits/main)
 
-# Raportare bug si rezolvare cu pull request
+## Raportare bug si rezolvare cu pull request
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/d425a3a2-24bd-43d8-a0df-4e882116a173)
 
-# Refactoring, code standards
+## Refactoring, code standards
 
-# Comentarii cod
+## Comentarii cod
 
-# Design patterns
+## Design patterns
 
 # Folosirea unui tool de AI care ajuta in timpul dezvoltarii software
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/55ff226a-e9a5-409a-bcee-792253bc1811)
 
-#  Demo
+##  Demo
 
-# Software-uri folosite
+## Software-uri folosite
 Unity
 Microsoft Visual Studio
 Blender

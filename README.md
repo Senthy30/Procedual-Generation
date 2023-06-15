@@ -40,6 +40,7 @@ Totolici Alexandru-Gabriel
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/eac19460-cb86-4d4c-97be-03b14f0fc579)
 
 ## Diagrame
+![Diagram](https://github.com/Senthy30/Procedual-Generation/assets/99651447/2c48aeb1-2910-4487-9e4c-3f61d1b6d8a2)
 
 ## Source control cu git
 [branch creation, merge/rebase, pull requests, minim 10 commits](https://github.com/Senthy30/Procedual-Generation/commits/main)

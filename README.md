@@ -42,7 +42,7 @@ Totolici Alexandru-Gabriel
 ## Diagrame
 
 ## Source control cu git
-[branch creation, merge/rebase, pull requests, minim 10 commits}(https://github.com/Senthy30/Procedual-Generation/commits/main)
+[branch creation, merge/rebase, pull requests, minim 10 commits](https://github.com/Senthy30/Procedual-Generation/commits/main)
 
 ## Raportare bug si rezolvare cu pull request
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/d425a3a2-24bd-43d8-a0df-4e882116a173)

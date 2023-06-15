@@ -69,7 +69,7 @@
 
 
 ##  Demo
-[Demo Offline](https://youtu.be/LeG8XbXS2yk)
+[Demo Offline](https://youtu.be/I0oNCE0xHfo)
 
 
 ## Software-uri folosite

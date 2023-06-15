@@ -69,6 +69,8 @@
 
 
 ##  Demo
+[Demo Offline](https://youtu.be/LeG8XbXS2yk)
+
 
 ## Software-uri folosite
 - Unity

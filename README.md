@@ -50,6 +50,7 @@ Totolici Alexandru-Gabriel
 
 ## Refactoring, code standards
 ![refactor1](https://github.com/Senthy30/Procedual-Generation/assets/95080404/739670e5-862f-4633-a65c-960108821b1f)
+![image](https://github.com/Senthy30/Procedual-Generation/assets/95080404/e2b749b1-9d2e-4f62-a864-fdc1a0dee5ad)
 
 ## Comentarii cod
 <img width="573" alt="codcomentat" src="https://github.com/Senthy30/Procedual-Generation/assets/95080404/e349c5ac-757c-46c2-827f-2b5514f78661">

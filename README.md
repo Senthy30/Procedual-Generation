@@ -53,8 +53,8 @@ Totolici Alexandru-Gabriel
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/95080404/e2b749b1-9d2e-4f62-a864-fdc1a0dee5ad)
 
 ## Comentarii cod
-<img width="573" alt="codcomentat" src="https://github.com/Senthy30/Procedual-Generation/assets/95080404/e349c5ac-757c-46c2-827f-2b5514f78661">
 ![codcomentatv2](https://github.com/Senthy30/Procedual-Generation/assets/95080404/3b6758ec-20cc-4a25-9075-9ffa7f52604d)
+<img width="573" alt="codcomentat" src="https://github.com/Senthy30/Procedual-Generation/assets/95080404/e349c5ac-757c-46c2-827f-2b5514f78661">
 
 
 

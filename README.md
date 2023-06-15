@@ -53,7 +53,7 @@ Totolici Alexandru-Gabriel
 
 ## Design patterns
 
-# Folosirea unui tool de AI care ajuta in timpul dezvoltarii software
+## Folosirea unui tool de AI care ajuta in timpul dezvoltarii software
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/55ff226a-e9a5-409a-bcee-792253bc1811)
 
 ##  Demo

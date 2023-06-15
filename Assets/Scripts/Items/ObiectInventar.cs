@@ -28,4 +28,9 @@ public class ObiectInventar : MonoBehaviour, IInventoryItem
     {
         gameObject.SetActive(false);
     }
+
+    public void OnDrop()
+    {
+        gameObject.SetActive(true);
+    }
 }

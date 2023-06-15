@@ -499,13 +499,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
-<<<<<<< HEAD
+
         void OnCollisionEnter(Collision hit)
         { 
             IInventoryItem item = hit.collider.GetComponent<IInventoryItem>();
-            if(item != null) {
+            if (item != null) {
                 inventory.AddItem(item);
-=======
+            }
+        }
+
         private float currentTime;
 
         private void OnCollisionStay(Collision collision)
@@ -519,8 +521,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     currentTime -= Time.deltaTime;
                 }
 
-                Debug.Log(currentTime);
-
                 if (currentTime <= 0)
                 {
                     hpScript.health -= collision.gameObject.GetComponent<AIEnemyScript>().damage;
@@ -528,7 +528,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     hpScript.UpdateHpBar();
                     currentTime = 0.5f;
                 }
->>>>>>> Mobs
+
             }
         }
     }

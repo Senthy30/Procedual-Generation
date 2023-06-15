@@ -9,9 +9,9 @@ public class HUD : MonoBehaviour {
 
     /* public GameObject MessagePanel; */
 
-	// Use this for initialization
 	void Start () {
         Inventory.ItemAdded += InventoryScript_ItemAdded;
+        Inventory.ItemRemoved += Inventory_ItemRemoved;
 	}
 
     private void InventoryScript_ItemAdded(object sender, InventoryEventArgs e)
@@ -29,9 +29,30 @@ public class HUD : MonoBehaviour {
 
                 break;
             }
-             
-          
+                   
         }
+    }
+
+    private void Inventory_ItemRemoved(object sender, InventoryEventArgs e)
+    {
+        Transform inventoryPanel = transform.Find("Inventory");
+        foreach (Transform slot in inventoryPanel)
+        {
+            int currentSlotIndex = slot.GetSiblingIndex();
+
+            if (currentSlotIndex == e.SlotIndex - 1) {
+                
+                Image image = slot.GetChild(0).GetChild(0).GetComponent<Image>();
+                if (image.enabled)
+                {
+                    image.enabled = false;
+                    image.sprite = null;
+                    break;
+                }
+            }
+                
+        }
+ 
     }
 
     /*

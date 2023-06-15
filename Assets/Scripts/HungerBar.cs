@@ -32,11 +32,11 @@ public class HungerBar : MonoBehaviour
         UpdateHungerBar();
     }
 
-    void UpdateHungerBar(){
+    public void UpdateHungerBar(){
         hungerBar.value = hunger;
     }
 
-    void Eat(float foodValue){
+    public void Eat(float foodValue){
         hungerBar.value += foodValue;
     }
 }

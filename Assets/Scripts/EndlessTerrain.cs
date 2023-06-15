@@ -278,7 +278,7 @@ public class EndlessTerrain : MonoBehaviour {
 			}
 		}
 
-        GameObject SpawnOakBush(int x, int y, TreeTypes treeTypes) {
+        GameObject SpawnOakBush(int x, int y, TreeTypes treeTypes, TreeTypes mushrooms, ref Vector2Int posMushroom) {
 			int length = treeTypes.prob.Length;
             int stIdx = treeTypes.startIdx;
 			int maxValue = treeTypes.prob[length - 1];
@@ -292,7 +292,21 @@ public class EndlessTerrain : MonoBehaviour {
 					break;
 				}
 
-            if (type == 11) {
+			if(type < 11) {
+                randomValue = (Mathf.Abs(x) + Mathf.Abs(y)) * 1001593 % 100;
+
+				if(randomValue > 95) {
+                    int valX = (Mathf.Abs(x) + Mathf.Abs(y)) * 1001593 % 2;
+					int valY = (Mathf.Abs(2*x) + Mathf.Abs(2*y)) * 1001593 % 2;
+
+					if (valX == 0)
+						valX = -1;
+					if(valY == 0)
+						valY = -1;
+
+                    posMushroom = new Vector2Int(valX, valY);
+				}
+            } else if (type == 11) {
                 randomValue = (Mathf.Abs(x) + Mathf.Abs(y)) * 1001593 % 100;
 
 				if (randomValue <= 95)
@@ -322,6 +336,8 @@ public class EndlessTerrain : MonoBehaviour {
                 new TreeTypes(11, new int[1] {10})
             };
 
+			TreeTypes mushrooms = new TreeTypes(12, new int[1] { 10 });
+
             int stIdx = 5;
             int lengthR = mapData.treesMap.GetLength(0);
             int lengthC = mapData.treesMap.GetLength(1);
@@ -332,17 +348,24 @@ public class EndlessTerrain : MonoBehaviour {
 
                     float height = terrainData.meshHeightCurve.Evaluate(mapData.heightMap[x, y]) * terrainData.meshHeightMultiplier;
 					GameObject obj = null;
+					Vector2Int posMushroom = new Vector2Int(0, 0);
                     
 					if (mapData.biomesMap[x, y] == 7) {
-						obj = SpawnOakBush(x, y, treeTypes[0]);
+						obj = SpawnOakBush(x, y, treeTypes[0], mushrooms, ref posMushroom);
                     } else if (mapData.biomesMap[x, y] == 5) {
-                        obj = SpawnOakBush(x, y, treeTypes[1]);
+                        obj = SpawnOakBush(x, y, treeTypes[1], mushrooms, ref posMushroom);
                     } else if(mapData.biomesMap[x, y] == 8) {
-                        obj = SpawnOakBush(x, y, treeTypes[2]);
+                        obj = SpawnOakBush(x, y, treeTypes[2], mushrooms, ref posMushroom);
                     }
 
-                    if(obj != null)
+					if (obj != null) {
 						obj.transform.localPosition = new Vector3(-lengthR / 2 + x, height, lengthC / 2 - y);
+
+						if(posMushroom.x != 0 || posMushroom.y != 0) {
+							GameObject obj2 = Instantiate(treeGameObject[mushrooms.startIdx], meshObject.transform);
+							obj2.transform.localPosition = new Vector3(-lengthR / 2 + x + posMushroom.x, height, lengthC / 2 - y + posMushroom.y);
+                        }
+					}
                 }
             }
         }

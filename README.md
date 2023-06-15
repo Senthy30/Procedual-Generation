@@ -52,6 +52,8 @@ Totolici Alexandru-Gabriel
 ## Comentarii cod
 
 ## Design patterns
+![image](https://github.com/Senthy30/Procedual-Generation/assets/95080404/76bb1756-d80f-476d-ae9e-2a46ad01c8cd)
+
 
 ## Folosirea unui tool de AI care ajuta in timpul dezvoltarii software
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/55ff226a-e9a5-409a-bcee-792253bc1811)

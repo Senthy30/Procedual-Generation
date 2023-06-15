@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -127,15 +128,22 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
         public Slider energyBar;
-
+        GameObject resume;
+        GameObject crosshair;
         private void Start()
         {
             oxygenBar = GameObject.Find("oxygenBar").GetComponent<Slider>();
             energyBar = GameObject.Find("energyBar").GetComponent<Slider>();
-            
+
+            resume = GameObject.Find("resumeMessage");
+            crosshair = GameObject.Find("Crosshair");
+
             m_RigidBody = GetComponent<Rigidbody>();
             m_Capsule = GetComponent<CapsuleCollider>();
             mouseLook.Init (transform, cam.transform);
+
+            airStartTime = Time.time;
+            resume.gameObject.SetActive(false);
         }
 
         public Slider oxygenBar;
@@ -153,22 +161,40 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float maxEnergy = 100f;
         public float Energy = 100f;
         public float EnergyRate = 1f;
+        public static bool gameIsPaused;
 
         private void Update()
         {
 
-			if (Input.GetKeyDown (KeyCode.Escape)) {
-				Debug.Break ();
-			}
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                    gameIsPaused = !gameIsPaused;
+                    PauseGame();
+            }
+           
+            void PauseGame()
+            {
+                if (gameIsPaused)
+                {
+                    Time.timeScale = 0f;
+                    resume.gameObject.SetActive(true);
+                    crosshair.gameObject.SetActive(false);
+                }
+                else
+                {
+                    resume.gameObject.SetActive(false);
+                    crosshair.gameObject.SetActive(true);
+                    Time.timeScale = 1;
+                }
+            }
 
             RotateView();
 
-			if (Input.GetButtonDown("Jump") && !m_Jump)
+		    if (Input.GetButtonDown("Jump") && !m_Jump)
             {
                 m_Jump = true;
 
             }
-
 
             //this counts how much time the player stays in air
             if (inAir == true)

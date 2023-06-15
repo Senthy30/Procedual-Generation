@@ -11,7 +11,7 @@ public class HungerBar : MonoBehaviour
     public Slider hungerBar;
 
     void Start(){
-        hungerBar = GameObject.Find("hungerBar").GetComponent<Slider>();
+        // hungerBar = GameObject.Find("hungerBar").GetComponent<Slider>();
         // Set the initial value of the hunger bar
         UpdateHungerBar();
     }
@@ -35,7 +35,9 @@ public class HungerBar : MonoBehaviour
     void UpdateHungerBar(){
         hungerBar.value = hunger;
     }
+        
 
+   
     void Eat(float foodValue){
         hungerBar.value += foodValue;
     }

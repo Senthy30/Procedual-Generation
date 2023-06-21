@@ -83,8 +83,8 @@ Commits
 
 ## Testarea automata
 
-Deoarece testarea automata este foarte greu de efectuat in Unity, am optat pentru testare manuala facute de fiecare dintre noi
-Mai jos apare cateva poze cu bug-uri gasite in timp ce testam
+Deoarece testarea automata este foarte greu de efectuat in Unity, am optat pentru testare manuala facute de fiecare dintre noi <br>
+Mai jos apar cateva poze cu bug-uri gasite in timp ce testam
 
 Animalele erau uriase
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/101453649/4bf75dfe-9ccb-4335-a678-f0b3ecf063aa)

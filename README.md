@@ -67,6 +67,37 @@
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/c8b797cb-e8d9-427a-8f5f-ca770542b1ee)
 ![image](https://github.com/Senthy30/Procedual-Generation/assets/99651514/17940d76-f566-4d9e-9fb3-8c87343ee796)
 
+## Source control cu git
+
+Branch Creation
+<img width="905" alt="image" src="https://github.com/Senthy30/Procedual-Generation/assets/101453649/e1c35ba0-a2a2-475b-bb4e-600264a36c53">
+
+Merge
+<img width="930" alt="image" src="https://github.com/Senthy30/Procedual-Generation/assets/101453649/f83c5098-483b-4ac2-93a6-086a1314f897">
+
+Pull requests
+<img width="909" alt="image" src="https://github.com/Senthy30/Procedual-Generation/assets/101453649/743847dc-8917-48c8-b9fd-0fea902c65f6">
+
+Commits
+<img width="619" alt="image" src="https://github.com/Senthy30/Procedual-Generation/assets/101453649/62e1ab01-5f0d-487f-abf7-0605dc6f0b83">
+
+## Testarea automata
+
+Deoarece testarea automata este foarte greu de efectuat in Unity, am optat pentru testare manuala facute de fiecare dintre noi
+Mai jos apare cateva poze cu bug-uri gasite in timp ce testam
+
+Animalele erau uriase
+![image](https://github.com/Senthy30/Procedual-Generation/assets/101453649/4bf75dfe-9ccb-4335-a678-f0b3ecf063aa)
+
+Mobii se spawnau la infinit daca timpul curent era miezul noptii
+![image](https://github.com/Senthy30/Procedual-Generation/assets/101453649/8af95442-92ae-4044-87e8-984addcf683f)
+
+Ciuperca nu disparea dupa ce era mancata
+<img width="472" alt="image" src="https://github.com/Senthy30/Procedual-Generation/assets/101453649/2cecaf7f-31fc-41c7-9fc8-79e9a7fdc0ef">
+
+Animalele nu cadea pe suprafata pamantului
+![image](https://github.com/Senthy30/Procedual-Generation/assets/101453649/c3a09420-1382-4003-924e-d6aa65799baf)
+
 
 ##  Demo
 [Demo Offline](https://youtu.be/I0oNCE0xHfo)
